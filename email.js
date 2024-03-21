@@ -8,20 +8,33 @@ apiKey.apiKey = 'your-api-key';
 
 // Instantiate the client for sending email templates
 const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
-
-// Set the template ID to be sent
 const templateId = 1;
 
-// Create the email request
-const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
-sendSmtpEmail.templateId = templateId;
+// Define the email recipients array
+const emailRecipients = [
+    "rishimishra0404@gmail.com",
+    "rishimishra639@gmail.com"
+];
 
-// Add recipient details
-sendSmtpEmail.to = [{ "email": "rishimishra0404@gmail.com" }];
-
-// Send the email template
-apiInstance.sendTransacEmail(sendSmtpEmail).then(function(data) {
-    console.log('Email template sent successfully. Returned data: ' + JSON.stringify(data));
-}, function(error) {
-    console.error(error);
+// Loop over each email recipient and send the email
+emailRecipients.forEach(email => {
+    // Create the email request
+    const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+    sendSmtpEmail.templateId = templateId;
+    
+    // Generate a random 16-digit hexadecimal string for the temporary password
+    const randomHex = [...Array(16)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
+    
+    // Set the recipient
+    sendSmtpEmail.to = [{ "email": email }];
+    
+    // Set the email parameters using the placeholder format
+    sendSmtpEmail.params = { "email": email, "tempPassword": randomHex };
+    
+    // Send the email template
+    apiInstance.sendTransacEmail(sendSmtpEmail).then(function(data) {
+        console.log('Email template sent successfully to ' + email + '. Returned data: ' + JSON.stringify(data));
+    }, function(error) {
+        console.error('Error sending email to ' + email + ':', error);
+    });
 });
